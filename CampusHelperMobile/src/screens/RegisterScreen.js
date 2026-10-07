@@ -13,7 +13,7 @@ import {
 
 import AppButton from '../components/AppButton';
 import theme from '../constants/theme';
-import { supabase } from '../services/supabase';
+import { isSupabaseConfigured, supabase } from '../services/supabase';
 
 export default function RegisterScreen({ navigation }) {
   const [fullName, setFullName] = useState('');
@@ -27,6 +27,14 @@ export default function RegisterScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   const register = async () => {
+    if (!isSupabaseConfigured || !supabase) {
+      Alert.alert(
+        'ตั้งค่า Supabase ไม่ครบ',
+        'เพิ่ม EXPO_PUBLIC_SUPABASE_URL และ EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY ในไฟล์ .env แล้วค่อยรีสตาร์แอปเปิลlication.'
+      );
+      return;
+    }
+
     if (
       !fullName.trim() ||
       !studentId.trim() ||

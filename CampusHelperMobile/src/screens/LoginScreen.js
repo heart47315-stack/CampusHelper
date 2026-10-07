@@ -14,7 +14,7 @@ import {
 
 import AppButton from '../components/AppButton';
 import theme from '../constants/theme';
-import { supabase } from '../services/supabase';
+import { isSupabaseConfigured, supabase } from '../services/supabase';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -22,6 +22,14 @@ export default function LoginScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   const login = async () => {
+    if (!isSupabaseConfigured || !supabase) {
+      Alert.alert(
+        'ตั้งค่า Supabase ไม่ครบ',
+        'เพิ่ม EXPO_PUBLIC_SUPABASE_URL และ EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY ในไฟล์ .env แล้วค่อยรีสตาร์แอปเปิลlication.'
+      );
+      return;
+    }
+
     if (!email.trim() || !password) {
       Alert.alert('ข้อมูลไม่ครบ', 'กรุณากรอก Email และ Password');
       return;
@@ -50,6 +58,48 @@ export default function LoginScreen({ navigation }) {
       Alert.alert(
         'เข้าสู่ระบบไม่สำเร็จ',
         error?.message || 'Email หรือ Password ไม่ถูกต้อง'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async () => {
+    if (!isSupabaseConfigured || !supabase) {
+      Alert.alert(
+        'ตั้งค่า Supabase ไม่ครบ',
+        'เพิ่ม EXPO_PUBLIC_SUPABASE_URL และ EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY ในไฟล์ .env แล้วค่อยรีสตาร์แอปเปิลlication.'
+      );
+      return;
+    }
+
+    if (!email.trim()) {
+      Alert.alert('ไม่พบ Email', 'กรุณากรอก Email ของบัญชีก่อนรีบตัสรหัสผ่าน');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail({
+        email: email.trim().toLowerCase(),
+        options: {
+          redirectTo: undefined,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      Alert.alert(
+        'ตรวจสอบอีเมล',
+        'ได้ส่งคำ instruct สำหรับรีบตัสรหัสผ่านไป Email ของคุณแล้ว'
+      );
+    } catch (error) {
+      console.error('Password reset error:', error);
+      Alert.alert(
+        'รีบตัสรหัสผ่านไม่สำเร็จ',
+        error?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่'
       );
     } finally {
       setLoading(false);
@@ -110,12 +160,8 @@ export default function LoginScreen({ navigation }) {
 
           <TouchableOpacity
             style={styles.forgot}
-            onPress={() =>
-              Alert.alert(
-                'ลืมรหัสผ่าน',
-                'ระบบ Reset Password จะเพิ่มในขั้นตอนถัดไป'
-              )
-            }
+            onPress={resetPassword}
+            disabled={loading}
           >
             <Text style={styles.forgotText}>ลืมรหัสผ่าน?</Text>
           </TouchableOpacity>
