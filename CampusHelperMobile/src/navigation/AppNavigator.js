@@ -1,81 +1,33 @@
-import React from "react";
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import {
-  NavigationContainer,
-} from "@react-navigation/native";
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import MainTabs from './MainTabs';
 
-import {
-  createNativeStackNavigator,
-} from "@react-navigation/native-stack";
-
-import LoginScreen from "../screens/LoginScreen";
-import DashboardScreen from "../screens/DashboardScreen";
-import TasksScreen from "../screens/TasksScreen";
-import CalendarScreen from "../screens/CalendarScreen";
-import CoursesScreen from "../screens/CoursesScreen";
-import GPAScreen from "../screens/GPAScreen";
-
-const Stack =
-  createNativeStackNavigator();
+const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   return (
-    <NavigationContainer>
-
-      <Stack.Navigator
-        initialRouteName="Login"
-        screenOptions={{
-          headerShown: false,
-          animation: "fade",
-        }}
-      >
-
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-        />
-
-        <Stack.Screen
-          name="Main"
-          component={MainNavigator}
-        />
-
-      </Stack.Navigator>
-
-    </NavigationContainer>
-  );
-}
-
-function MainNavigator() {
-  return (
     <Stack.Navigator
+      initialRouteName="Login"
       screenOptions={{
         headerShown: false,
       }}
     >
       <Stack.Screen
-        name="Dashboard"
-        component={DashboardScreen}
+        name="Login"
+        component={LoginScreen}
       />
 
       <Stack.Screen
-        name="Tasks"
-        component={TasksScreen}
+        name="Register"
+        component={RegisterScreen}
       />
 
       <Stack.Screen
-        name="Calendar"
-        component={CalendarScreen}
-      />
-
-      <Stack.Screen
-        name="Courses"
-        component={CoursesScreen}
-      />
-
-      <Stack.Screen
-        name="GPA"
-        component={GPAScreen}
+        name="Main"
+        component={MainTabs}
       />
     </Stack.Navigator>
   );
